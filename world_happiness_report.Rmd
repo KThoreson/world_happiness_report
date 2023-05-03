@@ -1,0 +1,195 @@
+---
+title: "world_happiness_report"
+author: "Kataleen_Thoreson"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+World Happiness Report
+Sustainable Development Solutions Network 2019
+https://www.kaggle.com/datasets/unsdsn/world-happiness/code
+
+This is the journey through my analysis of the World Happiness Report as my Capstone Project for my Google Data Analytics Certificate. 
+
+I initially loaded the data set into Sheets as the size of the files were permitting. I created a directory and uploaded the .csv files. I opened and examined each one. With a clear and present schema I cleaned and validated the data to ensure it had a consistent and uniform structure. 
+
+I did an introductory analysis of this dataset in sheets as the size of the .csv permitted. I made a table consisting of the minimum, maximum, average, and standard deviation of each of the table metrics.
+
+I created histograms to display where the results from the new table lied on the bell curve. I made graphs of each of the  facets of the report and the happiness score itself to show correlation.
+
+I repeated this process in SQL and Tableau and this is the culmination of those findings and the utilitarian tool that is R.
+
+This landmark survey conducted by Gallup World Poll was looking for additional factors other than monetary that influence the wellbeing of the populace. Experts in several fields came together to decide on these metrics and interviewed a sampling of the population of participating countries and asked them to rank these facets in their lives from 0 being the worst to 10 being the best. These facets do not incorporate into the happiness score itself so I am investigating the data for correlations in these areas and happiness.
+
+First, install the  necessary packages
+
+```{r}
+install.packages("tidyverse")
+install.packages("readr")
+install.packages("ggplot2")
+```
+
+Then, load the packages
+
+```{r}
+library("tidyverse")
+library("readr")
+library("ggplot2")
+```
+
+There are World Happiness Reports for years 2015-2019. For an initial analysis I will start with importing the report from 2015.
+
+```{r}
+whr_2015 <- read_csv("~/Downloads/World_Happines_Report/whr_2015.csv")
+glimpse(whr_2015)
+
+```
+
+Next I check the classification of the columns to ensure the integers and numeric strings are defined as numeric
+
+```{r}
+print(sapply(whr_2015, class))
+```
+
+To summarize the distribution of the metrics provided I created a boxplot for each. I chose to further define this distribution by region to be able to grasp the geography while looking the data
+
+Happiness Scores
+
+Defined on a scale from 1-10
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Happiness Score`, color = whr_2015$Region)) + 
+        geom_boxplot()
+```
+
+Economy (GDP per Capita)
+
+The equation for Purchasing Power Parity (PPP) uses the natural log of GDP per capita to establish a global scale for wealth 
+
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Economy (GDP per Capita)`, color = whr_2015$Region)) + 
+        geom_boxplot()
+```
+
+Family and support
+
+A binary question resulting from a poll inquiring if one had anyone to call in a time of need
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$Family, color = whr_2015$Region)) + 
+        geom_boxplot()
+```
+
+Health (Life Expectancy)
+
+Defined from birth year and location
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Health (Life Expectancy)`, color = whr_2015$Region)) + 
+        geom_boxplot()
+```
+
+Freedom
+
+Binary response regarding the perception of how free one is to make their own choices
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$Freedom, color = whr_2015$Region)) + 
+        geom_boxplot()
+
+```
+
+Trust (Government Corruption)
+
+A scalable poll defining the presence of business and/or government corruption
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Trust (Government Corruption)` , color = whr_2015$Region)) + 
+        geom_boxplot()
+```
+
+Generosity
+
+Defined as the residual of regressing the national average of GWP responses to the question “Have you donated money to a charity in the past month?” on GDP per capita
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$Generosity , color = whr_2015$Region)) + 
+        geom_boxplot()
+```
+
+Dystopia Residual
+
+Defined as an imaginary country with the worst possible conditions for its citizens
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Dystopia Residual` , color = whr_2015$Region)) + 
+        geom_boxplot()
+
+```
+
+Now It is time to assess any existing correlations between Happiness score an these defined metrics
+
+GDP vs Happiness Score
+
+There appears to be a clear correlation between happiness and wealth which had been a primary influnce to date
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Happiness Score` , y = whr_2015$`Economy (GDP per Capita)`,  color = whr_2015$Region)) + 
+        geom_point()
+```
+
+Family vs Happiness Score
+
+A clear trend exists between family and social support and happiness
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Happiness Score` , y = whr_2015$Family,  color = whr_2015$Region)) + 
+        geom_point()
+```
+
+Health (Life Expectancy) vs Happiness Score
+
+A clear trend exists between longevity and happiness
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Happiness Score` , y = whr_2015$`Health (Life Expectancy)`,  color = whr_2015$Region)) + 
+        geom_point()
+```
+
+Freedom vs Happiness Score
+
+The perception that you are free to determine your life choices does not appear to have any correlation for how this data was gathered
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Happiness Score` , y = whr_2015$Freedom,  color = whr_2015$Region)) + 
+        geom_point()
+```
+
+Trust (Government Corruption) vs Happiness Score
+
+The presence of business or government corruption do not have a correlation to happiness score in this poll
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Happiness Score` , y = whr_2015$`Trust (Government Corruption)` ,  color = whr_2015$Region)) + 
+        geom_point()
+```
+
+Generosity vs Happiness Score
+
+There does not appear to be a correlation between charitable donations and happiness score
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Happiness Score` , y = whr_2015$Generosity, color = whr_2015$Region)) + 
+        geom_point()
+```
+
+
+Dystopian Residual vs Happiness Score
+
+There is a clear correlation of dystopian residual and happiness score.
+
+```{r}
+ggplot(data = whr_2015, aes(x = whr_2015$`Happiness Score` , y = whr_2015$`Dystopia Residual`, color = whr_2015$Region)) + 
+        geom_point()
+```
+
+In conclusion, there is a clear correlation between GDP, Life Expectancy, Family support, dystopian residual and happiness score. While Freedom, the presence of corruption, and generosity can affect over all happiness it is not currently represented in this data set. These inconclusive metrics are primarily gathered through binary answers and perhaps a scalable revision to the poll would yield more definitive results in the future. 
